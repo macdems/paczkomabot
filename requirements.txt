@@ -1,0 +1,4 @@
+qrcode==7.4.2
+flask==2.2.5
+python-telegram-bot==12.4.2
+urllib3==1.23
