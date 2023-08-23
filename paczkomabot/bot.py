@@ -59,7 +59,7 @@ class TelegramBot:
                 title="Kod QR",
                 caption=f"Paczka na numer telefonu {phone} z kodem odbioru {code}",
                 photo_url=url,
-                thumb_url=f'{url}?thumb=true',
+                thumb_url=url,
                 photo_width=310,
                 photo_height=310
             )

@@ -27,8 +27,7 @@ async def root():
 
 @app.route('/qr/<phone>/<code>')
 async def qr(phone, code):
-    thumb = request.args.get('thumb', False)
-    img = make_qr_code_image(phone, code, thumb)[0]
+    img = make_qr_code_image(phone, code)
     return img.read(), 200, {'Content-Type': 'image/jpeg'}
 
 
