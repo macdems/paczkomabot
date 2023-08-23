@@ -1,3 +1,5 @@
-# Inpost QR Bot
+# PaczkomaBot
 
-This is a telegram bot that generates QR code for forwarded Inpost notification.
+Bot dla Telegrama generujący kody QR do odbioru paczek z paczkomatów InPostu.
+
+![Paczkomaty](images/paczkomaty.png)

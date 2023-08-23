@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Python: Quart",
+            "type": "python",
+            "request": "launch",
+            "module": "quart",
+            "env": {
+                "QUART_APP": "index.py:app",
+            },
+            "args": [
+                "run",
+                "--reload"
+            ],
+            "jinja": true,
+            "justMyCode": false
+        }
+    ]
+}
