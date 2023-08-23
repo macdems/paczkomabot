@@ -11,11 +11,6 @@ telegram_bot = TelegramBot(TOKEN)
 app = Quart(__name__)
 
 
-@app.before_serving
-async def initialize():
-    await telegram_bot.application.initialize()
-
-
 @app.route('/' + TOKEN, methods=['GET', 'POST'])
 async def webhook():
     #json = await request.get_json(force=True)

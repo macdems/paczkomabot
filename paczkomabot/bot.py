@@ -23,6 +23,8 @@ class TelegramBot:
 
     async def process(self, json):
         update = Update.de_json(json, self.application.bot)
+        if not self.application._initialized:
+            await self.application.initialize()
         await self.application.process_update(update)
 
     async def set_webhook(self, domain):
