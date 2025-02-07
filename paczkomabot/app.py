@@ -3,7 +3,7 @@ import os
 from quart import Quart, request
 
 from .bot import TelegramBot
-from .qr import make_qr_code_image
+from .qr import qrcode_inpost, qrcode_dhl
 
 TOKEN = os.environ['TOKEN']
 telegram_bot = TelegramBot(TOKEN)
@@ -25,9 +25,14 @@ async def root():
     return 'OK'
 
 
-@app.route('/qr/<phone>/<code>')
-async def qr(phone, code):
-    img = make_qr_code_image(phone, code)
+@app.route('/qr/<company>/<phone>/<code>')
+async def qr(company, phone, code):
+    if company == 'inpost':
+        img = qrcode_inpost(phone, code)
+    elif company == 'dhl':
+        img = qrcode_dhl(phone, code)
+    else:
+        return 'Not found', 404
     return img.read(), 200, {'Content-Type': 'image/jpeg'}
 
 
