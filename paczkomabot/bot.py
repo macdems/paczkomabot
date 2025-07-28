@@ -5,13 +5,15 @@ from telegram import Update, InlineQueryResultPhoto
 from telegram.ext import Application, CommandHandler, MessageHandler, InlineQueryHandler
 from telegram.ext.filters import Regex
 
-from .qr import qrcode_inpost, qrcode_dhl
+from .qr import qrcode_inpost, qrcode_dhl, qrcode_allegro
 
 INPOST_MESSAGE_RE = re.compile(r'.*kod(?:em)? (?P<code>\d+) .*numer telefonu (?P<phone>\d{9}).*')
 DHL_MESSAGE_RE = re.compile(r'Paczka (?P<parcel>\d+), PIN (?P<pin>\d{6})\..*DHL BOX.*')
+ALLEGRO_MESSAGE_RE = re.compile(r'.*Allegro.*Nr odbiorcy: (?P<phone>\d{3} \d{3} \d{3}). Kod odbioru: (?P<code>\d{3} \d{3})\..*')
 
 INPOST_NUMBERS_RE = re.compile(r'P\|(?P<phone>\d{9})\|(?P<code>\d+)')
 DHL_NUMBERS_RE = re.compile(r'(?P<pin>\d{6})\|(?P<parcel>\d+)')
+ALLEGRO_NUMBERS_RE = re.compile(r'D:(?P<phone>\d+):(?P<code>\d{6})')
 
 
 class TelegramBot:
@@ -22,6 +24,7 @@ class TelegramBot:
 
         self.application.add_handler(MessageHandler(Regex(INPOST_MESSAGE_RE), self.process_inpost_message))
         self.application.add_handler(MessageHandler(Regex(DHL_MESSAGE_RE), self.process_dhl_message))
+        self.application.add_handler(MessageHandler(Regex(ALLEGRO_MESSAGE_RE), self.process_allegro_message))
         self.application.add_handler(CommandHandler("start", self.start))
         self.application.add_handler(InlineQueryHandler(self.inline_query))
 
@@ -49,9 +52,17 @@ class TelegramBot:
         img = qrcode_dhl(parcel, pin)
         await update.message.reply_photo(img)
 
+    async def process_allegro_message(self, update, context):
+        phone, code = context.matches[0].group('phone', 'code')
+        phone = phone.replace(' ', '')
+        code = code.replace(' ', '')
+        img = qrcode_allegro(phone, code)
+        await update.message.reply_photo(img)
+
     async def start(self, update, context):
         await update.message.reply_text(
-            "Udostępnij mi powiadomienie o przyjściu paczki z aplikacji InPost lub SMSa o przesyłce DHL BOX, a ja wygeneruję kod QR."
+            "Udostępnij mi powiadomienie o przyjściu paczki z aplikacji InPost albo Allegro lub SMSa o przesyłce DHL BOX, "
+            "a ja wygeneruję kod QR."
         )
 
     async def inline_query(self, update, context):
@@ -65,6 +76,12 @@ class TelegramBot:
             parcel, pin = match_dhl.group('parcel', 'pin')
             url = f'{await self.get_webhook_url_base()}/qr/dhl/{parcel}/{pin}'
             caption = f"Przesyłka w DHL BOX o numerze {parcel}, PIN {pin}"
+        elif match_allegro := (ALLEGRO_MESSAGE_RE.match(query) or ALLEGRO_NUMBERS_RE.match(query)):
+            phone, code = match_allegro.group('phone', 'code')
+            phone = phone.replace(' ', '')
+            code = code.replace(' ', '')
+            url = f'{await self.get_webhook_url_base()}/qr/allegro/{phone}/{code}'
+            caption = f"Przesyłka Allegro na numer odbiorcy {phone} z kodem odbioru {code}"
         else:
             return
 

@@ -21,3 +21,6 @@ def qrcode_inpost(phone, code, thumb=False):
 
 def qrcode_dhl(parcel, pin, thumb=False):
     return make_qrcode(f'{pin}|{parcel}', f'dhl-qr-{parcel}-{pin}.jpg', QM, 12, 6)
+
+def qrcode_allegro(phone, code, thumb=False):
+    return make_qrcode(f'D:{phone}:{code}', f'allegro-qr-{phone}-{code}.jpg', QM, 12, 6)
